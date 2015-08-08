@@ -16,7 +16,6 @@
  *     limitations under the License.
  */
 
-
 /**
  * Resizes a given image following the parameters provided.
  */
@@ -77,4 +76,31 @@ if(empty($width) && empty($height)) {
 
 	if(empty($width)) {
 		$width = $height / $ratio;
-	} else
+	} elseif(empty($height)) {
+		$height = $width * $ratio;
+	}
+}
+
+/**
+ * We calculate the top and left corner values needed to center the original
+ * image dimension into the new image's.
+ */
+
+$imgresource = imagecreatetruecolor($width, $height);
+
+$resresult = imagecopyresampled(
+		$imgresource, 
+		$imgoriginal, 
+		0, 0,
+		0, 0,
+		$width, $height, 
+		$imgsize[0], $imgsize[1]);
+
+if($resresult) {
+	header('Content-type: image/jpeg');
+	imagejpeg($imgresource, null, 100);
+} else {
+	header('HTTP/1.1 500 Internal Server Error');
+	print 'An error occured while processing the given image';
+	exit;
+}
